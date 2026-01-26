@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Water Quality Analysis</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#f5f7fa] text-[#333] leading-relaxed font-[Segoe UI,Tahoma,Geneva,Verdana,sans-serif]">
+  <div class="max-w-[900px] mx-auto p-5">
+
+    <!-- HEADER -->
+    <header class="text-center mb-8 p-5 bg-white rounded-xl shadow-md">
+      <h1 class="text-[#2c5530] mb-2 text-3xl font-bold">Water Quality Analysis</h1>
+      <p class="text-[#666] text-lg">Analyze river water parameters & potability</p>
+    </header>
+
+    <section class="bg-white rounded-xl p-5 shadow visualization-section">
+
+      <!-- DROPDOWN + BUTTON -->
+      <div class="mb-6">
+        <label class="block text-[#2c5530] font-semibold mb-2 text-lg">Select River</label>
+
+        <select id="riverDropdown"
+          class="w-full p-3 bg-[#f8f9fa] border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4a9c5f]">
+          <option>Loading rivers...</option>
+        </select>
+
+        <button id="analyzeBtn"
+          class="mt-4 bg-[#4a9c5f] text-white px-6 py-2 rounded hover:bg-[#3a7c4a] transition">
+          Analyze Water Quality
+        </button>
+      </div>
+
+      <!-- TITLE -->
+      <h2 id="chartTitle"
+          class="text-[#2c5530] mb-4 border-b border-gray-200 pb-2 text-xl font-semibold">
+        Water Quality Visualization
+      </h2>
+
+      <!-- CHART -->
+      <div class="h-[350px] bg-[#f8f9fa] rounded-lg mb-5 p-3 relative">
+        <canvas id="myChart"></canvas>
+      </div>
+
+    </section>
+
+<!-- ============================
+       JS SECTION
+=============================== -->
+<script>
+const dropdown = document.getElementById("riverDropdown");
+const analyzeBtn = document.getElementById("analyzeBtn");
+const ctx = document.getElementById("myChart").getContext("2d");
+let myChart;
+
+// -------------------------------
+// Load river names from backend
+// -------------------------------
+async function loadRivers() {
+  try {
+    const res = await fetch("/rivers");
+    const rivers = await res.json();
+
+    dropdown.innerHTML =
+      `<option value="">Select a river</option>` +
+      rivers.map(r => `<option value="${r.name}">${r.name}</option>`).join("");
+
+  } catch (err) {
+    console.error("Failed to load rivers:", err);
+    dropdown.innerHTML = `<option value="">Error loading rivers</option>`;
+  }
+}
+
+// -------------------------------
+// Draw fixed (non-animated) graph
+// -------------------------------
+function animateChart(params) {
+  const labels = Object.keys(params);
+  const values = Object.values(params);
+
+  if (myChart) myChart.destroy();
+
+  myChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Water Parameter Levels",
+        data: values,
+        backgroundColor: "#4a9c5f"
+      }]
+    },
+    options: {
+      animation: false,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+
+// -------------------------------
+// On Analyze Water click
+// -------------------------------
+analyzeBtn.addEventListener("click", async () => {
+  const river = dropdown.value;
+  if (!river) {
+    alert("Please select a river first");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/predict/${encodeURIComponent(river)}`);
+
+    if (!res.ok) {
+      const err = await res.json();
+      alert(err.detail || "Backend error");
+      return;
+    }
+
+    const data = await res.json();
+
+    // Filter only displayed parameters
+    const filtered = Object.fromEntries(
+      Object.entries(data.input_parameters).filter(
+        ([k]) => !["chloride", "fluoride", "iron"].includes(k)
+      )
+    );
+
+    animateChart(filtered);
+
+    const prob = data.potability_probability;   // 0–1
+    const label = data.potability_label;        // potable / not potable
+
+    const probPercent = (prob * 100).toFixed(1);
+
+    // ----------------------
+    // TITLE WITHOUT SCORE
+    // ----------------------
+    document.getElementById("chartTitle").innerText =
+      `${data.river_name} • Potability: ${probPercent}% • ${label.toUpperCase()}`;
+
+  } catch (err) {
+    console.error("Prediction error:", err);
+    alert("Failed to contact backend");
+  }
+});
+
+// Load dropdown on page open
+loadRivers();
+</script>
+
+</body>
+</html>
