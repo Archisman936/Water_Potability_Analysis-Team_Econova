@@ -2,7 +2,7 @@
 
 ## 🏆 Hackathon Project
 
-This project was developed as part of **Sreejan**, a hackathon conducted at **Techno India University** by **Sustainovate**, the *Official Sustainability and Innovation Club of Techno India University*, focused on solving real-world sustainability and public health challenges using **AI & data-driven approaches**. The solution secured **2nd place**, recognizing its impact, innovation, and practical applicability.
+This project was developed as part of Sreejan, a hackathon conducted at Techno India University by Sustainovate, the Official Sustainability and Innovation Club of Techno India University, focused on solving real-world sustainability and public health challenges using AI & data-driven approaches. The solution secured 2nd place, recognizing its impact, innovation, and practical applicability.
 
 ---
 
