@@ -21,6 +21,48 @@ This project focuses especially on **Indian rivers**, many of which are severely
 
 ---
 
+🚀 How to Run Locally
+---------------------
+
+Follow these steps to view and run the project on your local machine:
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Archisman936/Water-Potability-Analysis---Team-Econova.git
+cd Water-Potability-Analysis---Team-Econova
+```
+
+### 2. Set Up a Virtual Environment (Recommended)
+```bash
+python -m venv venv
+```
+- **Windows**: `venv\Scripts\activate`
+- **macOS/Linux**: `source venv/bin/activate`
+
+### 3. Install Dependencies
+```bash
+pip install fastapi uvicorn pydantic numpy pandas scikit-learn joblib catboost
+```
+
+### 4. Run the Backend Server
+```bash
+cd Backend
+python main.py
+```
+This starts the FastAPI server with Uvicorn at **http://127.0.0.1:8000**.
+
+### 5. Open in Browser
+Navigate to **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser to view the application.
+
+> **Note:** The FastAPI backend automatically serves the frontend (`index.html`). No separate frontend server is needed.
+
+### 6. API Documentation
+FastAPI provides auto-generated interactive docs:
+- **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+
+---
+
 🚨 Background & Motivation
 -------------------------
 - **Massive Health Burden**: Millions are affected annually by water-borne diseases in India.
